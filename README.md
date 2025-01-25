@@ -66,67 +66,42 @@ Now, your environment is set up and ready for use.
 Below is the directory structure for the recommender system project:
 
 📂 recommender-system  
+
     │── 📄 README.md # Project documentation  
-    │── 📄 workflow.md # Workflow explanation  
-    │── 📄 requirements.txt # Python dependencies  
+
     │── 📂 data # Dataset folder  
         ├── 📄 interactions.csv # User interactions data  
-        ├── 📄 items.csv # Items metadata  
-    │── 📂 models # Trained model storage   
-        ├── 📄 model.pkl # Serialized ML model  
-    │── 📂 environment # contain files to set enviornment 
+        ├── 📄 items.csv # Items metadata   
+
+    │── 📂 environment # contain files to set enviornment  
         ├── 📄 environment.yml # yaml file containing required packages   
+
     │── 📂 src # Source code folder  
-        │── 📂 rec_engine # Source code folder 
-            ├── 📄 data_loader.py # Training script  
-            ├── 📄 data_processor.py # Training script  
-            ├── 📄 train.py # Training script  
-            ├── 📄 recommend.py # Recommendation generation  
+        ├── 📄 main.py # main script
+        │── 📂 rec_engine # Source code folder  
+            ├── 📄 config.toml # configuration file
+            ├── 📄 version.py # contains package version 
+            │── 📂 code # Source code folder 
+                ├── 📄 data_loader.py # handles data loading/fetching  
+                ├── 📄 data_processor.py # used for data cleaning
+                ├── 📄 model.py # contain ml algorithims  
+                ├── 📄 evaluation.py # evaluate prediction results
+                ├── 📄 config.py # handles config file 
+                ├── 📄 pipeline.py # integrate modules
         │── 📂 tests # Unit tests  
-            ├── 📄 test_recommend.py # Test cases for recommendation system  
+            │── 📂 .test_data # folder containing sample test datsets
+            ├── 📄 conftest.py # pytest configuration file
+            ├── 📄 test_data_processor.py # contain unit tests for data processer module
+            ├── 📄 test_modeling.py # contain unit tests for modling module
+            ├── 📄 test_evaluator.py # contain unit tests for evaluation module
+
     │── 📂  documentation # Diagrams and visualizations  
         ├── 📄 workflow.svg # Workflow diagram  
 
     │── 📂 deployment # Deployment-related files  
         ├── 📄 Dockerfile # Docker configuration  
         ├── 📄 app.py # API endpoint  
-        ├── 📄 config.yaml # Configuration file
-
-
-
-## **Workflow Stages**  
-
-### **1. User Input**  
-The system begins by collecting user preferences, browsing history, or explicit ratings to understand their interests.  
-
-### **2. Data Preprocessing**  
-- Cleans the raw data by handling missing values, outliers, and duplicate records.  
-- Normalizes and standardizes features if necessary.  
-
-### **3. Feature Engineering**  
-- Extracts important features from the dataset.  
-- Implements dimensionality reduction techniques if required.  
-
-### **4. Model Training**  
-- Uses collaborative filtering, content-based filtering, or hybrid approaches.  
-- Trains the recommendation model using historical data.  
-
-### **5. Model Evaluation**  
-- Evaluates the trained model using metrics like RMSE, precision-recall, or AUC.  
-- Performs hyperparameter tuning for optimization.  
-
-### **6. Recommendation Generation**  
-- Predicts user preferences based on the trained model.  
-- Generates a ranked list of recommended items.  
-
-### **7. User Interaction**  
-- Displays recommendations to users in a personalized manner.  
-- Captures user feedback to further improve the model.  
-
-## **Future Improvements**  
-- Implement reinforcement learning for continuous improvement.  
-- Personalize recommendations using real-time user interactions.  
-- Optimize model performance with scalable deployment strategies.  
+        ├── 📄 config.yaml # Configuration file  
 
 
 ### Contributing

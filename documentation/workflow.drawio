@@ -66,7 +66,7 @@
                         <mxPoint x="370" y="209.75" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="304" value="train data" style="html=1;dashed=0;whitespace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                <mxCell id="304" value="&lt;b&gt;Train Data&lt;/b&gt;" style="html=1;dashed=0;whitespace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
                     <mxGeometry x="250" y="130" width="90" height="39.75" as="geometry"/>
                 </mxCell>
                 <mxCell id="305" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
@@ -108,7 +108,7 @@
                 <mxCell id="330" style="edgeStyle=none;html=1;entryX=0.035;entryY=0.904;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="325" target="309">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="325" value="&lt;span style=&quot;&quot;&gt;&lt;b&gt;evaluation data: &lt;/b&gt;&lt;br&gt;contain users who took atleast 1 new product in last 6 months&lt;/span&gt;" style="whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;dashed=0;" vertex="1" parent="1">
+                <mxCell id="325" value="&lt;span style=&quot;&quot;&gt;&lt;b&gt;Evaluation Data: &lt;/b&gt;&lt;br&gt;contain users who took atleast 1 new product in last 6 months&lt;/span&gt;" style="whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;dashed=0;" vertex="1" parent="1">
                     <mxGeometry x="290" y="300" width="235" height="60.01" as="geometry"/>
                 </mxCell>
                 <mxCell id="328" style="edgeStyle=none;html=1;" edge="1" parent="1">
