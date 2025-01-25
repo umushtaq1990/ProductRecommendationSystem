@@ -1,11 +1,130 @@
 <mxfile host="65bd71144e">
     <diagram id="EMZWgJTImHTloj3RdRXw" name="Page-1">
-        <mxGraphModel dx="1268" dy="988" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ddf9fd" math="0" shadow="0">
+        <mxGraphModel dx="954" dy="765" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ddf9fd" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="15" value="" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/ai_machine_learning/Machine_Learning.svg;" vertex="1" parent="1">
-                    <mxGeometry x="230" y="230" width="64" height="68" as="geometry"/>
+                <mxCell id="285" value="Load Data" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.database;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="10" y="130" width="60" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="287" value="" style="endArrow=classic;html=1;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="70" y="169.5" as="sourcePoint"/>
+                        <mxPoint x="110" y="170" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="100" y="170"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="288" value="&lt;b&gt;Data Process&lt;/b&gt;&lt;br&gt;&amp;nbsp;- Clean&amp;nbsp; &amp;nbsp;&lt;br&gt;- Format&lt;br&gt;- Scale&amp;nbsp;&lt;br&gt;&lt;br&gt;&lt;b&gt;Split Training, &lt;br&gt;Evaluation&lt;/b&gt;&lt;br&gt;- Keep last 6 &lt;br&gt;months data for&lt;br&gt;&amp;nbsp;evaluation and other&lt;br&gt;data for trainiing" style="html=1;dashed=0;whitespace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="40" width="110" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="289" value="" style="endArrow=classic;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;" parent="1" edge="1" source="304">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="350" y="120" as="sourcePoint"/>
+                        <mxPoint x="370" y="100" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="360" y="110"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="290" value="SVD" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#067F68;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.sagemaker_model;" parent="1" vertex="1">
+                    <mxGeometry x="474.18" y="40" width="78" height="78" as="geometry"/>
+                </mxCell>
+                <mxCell id="321" value="" style="edgeStyle=none;html=1;exitX=1.105;exitY=0.497;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="291" target="297">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="570" y="230" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="291" value="CF" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#067F68;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.sagemaker_model;" parent="1" vertex="1">
+                    <mxGeometry x="474.18" y="191.25" width="78" height="78" as="geometry"/>
+                </mxCell>
+                <mxCell id="294" value="Recommendations Table" style="shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#4495D1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.veeam.2d.report;" parent="1" vertex="1">
+                    <mxGeometry x="594.18" y="40" width="70" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="296" value="" style="endArrow=classic;html=1;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="554.18" y="77.5" as="sourcePoint"/>
+                        <mxPoint x="594.18" y="78" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="584.18" y="78"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="297" value="Recommendations Table" style="shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#4495D1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.veeam.2d.report;" parent="1" vertex="1">
+                    <mxGeometry x="594.18" y="191.25" width="70" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="299" value="generate &lt;br&gt;rating data" style="html=1;dashed=0;whitespace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="60" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="300" value="generate user &lt;br&gt;data (PCA)" style="html=1;dashed=0;whitespace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="210" width="80" height="42.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="303" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="340" y="169.75" as="sourcePoint"/>
+                        <mxPoint x="370" y="209.75" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="304" value="train data" style="html=1;dashed=0;whitespace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="250" y="130" width="90" height="39.75" as="geometry"/>
+                </mxCell>
+                <mxCell id="305" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="220" y="149.38" as="sourcePoint"/>
+                        <mxPoint x="250" y="149.38" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="309" value="&lt;b&gt;Evaluation Table&lt;br&gt;&lt;/b&gt;- Recall Score&lt;br&gt;&lt;br&gt;- Match new products&lt;br&gt;taken by each user&lt;br&gt;with predicted&amp;nbsp;&lt;br&gt;results by taking into &lt;br&gt;account top k &lt;br&gt;recommendations.&lt;br&gt;" style="html=1;dashed=0;whitespace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="720" y="40" width="120" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="317" style="edgeStyle=none;html=1;entryX=-0.038;entryY=0.562;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="664.18" y="79.50468399031055" as="sourcePoint"/>
+                        <mxPoint x="719.9999999999999" y="79.56000000000003" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="684.18" y="79.72"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="319" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="444.17999999999984" y="230.75" as="sourcePoint"/>
+                        <mxPoint x="474.17999999999984" y="231.25" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="474.17999999999995" y="231.25"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="320" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="444.17999999999984" y="79.5" as="sourcePoint"/>
+                        <mxPoint x="474.17999999999984" y="80" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="474.17999999999995" y="80"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="330" style="edgeStyle=none;html=1;entryX=0.035;entryY=0.904;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="325" target="309">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="325" value="&lt;span style=&quot;&quot;&gt;&lt;b&gt;evaluation data: &lt;/b&gt;&lt;br&gt;contain users who took atleast 1 new product in last 6 months&lt;/span&gt;" style="whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;dashed=0;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="300" width="235" height="60.01" as="geometry"/>
+                </mxCell>
+                <mxCell id="328" style="edgeStyle=none;html=1;" edge="1" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="220" y="340" as="sourcePoint"/>
+                        <mxPoint x="290" y="340" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="329" style="edgeStyle=none;html=1;entryX=-0.038;entryY=0.562;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="664.1799999999998" y="240.00468399031058" as="sourcePoint"/>
+                        <mxPoint x="720" y="240.06000000000006" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="684.18" y="240.22"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
             </root>
         </mxGraphModel>
