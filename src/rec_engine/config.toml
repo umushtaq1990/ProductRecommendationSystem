@@ -1,0 +1,12 @@
+title = "Recommendation Engine Default Configuration"
+# ==============================================================================
+[args]
+user_id = "id"
+rating_id = "rating"
+
+[args.data_loader]
+    movie_file = "movies.csv"
+    rating_file = "ratings.csv"
+
+[args.data_processor]
+    validation_data_duration = 3

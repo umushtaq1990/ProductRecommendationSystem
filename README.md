@@ -22,33 +22,12 @@ The following diagram represents the workflow of the recommender system:
 
 Before going into explaination of this workflow lets fetch the git repository containing code and prepare the enviornment.
 
-### Installation
+### How to Run?
 
 #### Prerequisites
 Make sure you have Conda installed. If you don’t have it yet, you can download it from [Anaconda's website](https://www.anaconda.com/products/distribution) or install it via Miniconda.
 
-
-**Step 1: Create a Conda Environment**
-
-To set up a clean environment with all necessary dependencies, you can create a new Conda environment.
-
-Run the following commands in your terminal or command prompt:
-
-```bash
-conda create -n product-recommendation python=3.8
-conda activate product-recommendation
-```
-
-This will create a new Conda environment named `product-recommendation` with Python 3.8 installed and activate the environment.
-
-**Step 2: Install Dependencies**
-
-Once the environment is activated, install the required dependencies from environment.yml.
-
-```bash
-conda env create -f environment.yml
-```
-**Step 3: Clone the Repository**
+**Step 1: Clone the Repository**
 
 To get started, clone this repository:
 
@@ -58,7 +37,14 @@ git clone https://github.com/umushtaq1990/product-recommendation-engine.git
 cd product-recommendation-engine
 ```
 
-Now, your environment is set up and ready for use.
+**Step 2: Create Conda Environment**
+
+Create a new Conda environment with the name specified in the .yml file.
+
+```bash
+conda env create -f environment.yml
+```
+Now, your environment is set up, activate the enviornment.
 
 
 ### Project Directory Structure
@@ -103,6 +89,9 @@ Below is the directory structure for the recommender system project:
         ├── 📄 app.py # API endpoint  
         ├── 📄 config.yaml # Configuration file  
 
+### Data
+Use this link to download movies.csv and ratings.csv files: https://www.kaggle.com/datasets/nicoletacilibiu/movies-and-ratings-for-recommendation-system?select=ratings.csv
+ 
 
 ### Contributing
 If you have any suggestions or improvements for this project, feel free to fork the repository and submit a pull request.
@@ -130,6 +119,10 @@ recommended results, recall
 score for that model
 will be 0.7 
 
+
+Author: Usman Mushtaq  
+Data Scientist / Data Engineer / Data Analyst  
+Email: usmanmushtaq1990@gmail.com
 
 
 
