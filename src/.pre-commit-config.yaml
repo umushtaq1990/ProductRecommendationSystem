@@ -1,0 +1,41 @@
+fail_fast: false  # stop running hooks after the first failure
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: jsonlines$
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: detect-private-key
+      - id: requirements-txt-fixer
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [
+          "--multi-line=3",
+          "--trailing-comma",
+          "--force-grid-wrap=0",
+          "--use-parentheses",
+          "--line-width=80",
+          "--balanced",
+        ]  # https://pycqa.github.io/isort/docs/configuration/options.html#python-version
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        args:
+          - -l 80  # character limit
+          #- -q  # quiet
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.1
+    hooks:
+      - id: mypy
+        exclude: (?x)^(
+          src/tests/
+          |documentation/
+          )

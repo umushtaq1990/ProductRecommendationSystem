@@ -2,19 +2,28 @@
 # loads the data from desired directory or datastore component in azure data asset
 
 import pandas as pd
-from azureml.core import Dataset, Datastore, Workspace
-from .config import get_toml
+from typing import Any, Dict, Union
+from pathlib import Path
+from config import get_toml, ParametersConfig
 
 
 class DataLoader:
     def __init__(
-        self, args: ParametersConfig,
+        self, config: Dict[str, Any]
     ) -> None:
-        self.args = args
+        self.config = config
+        self.args = ParametersConfig.from_toml(path_or_dict=self.config)
     
     @classmethod
-    def from_toml(cls) -> "DataLoader":
-        return cls(config=get_toml())
+    def from_toml(
+        cls,
+        path_or_dict: Union[Path, str, Dict[str, Any]],
+    ) -> "DataLoader":
+        if isinstance(path_or_dict, dict):
+            config = path_or_dict
+        else:
+            config = get_toml(config_suffix=str(path_or_dict))
+        return cls(config=config)
     
     def load_data(
         self,
@@ -28,3 +37,11 @@ class DataLoader:
         Returns:
             str: Latest folder name
         """
+        df = pd.read_csv(self.args.data_loader["data_path"])
+        return df
+
+
+if __name__ == "__main__":
+    config = get_toml()
+    dl = DataLoader.from_toml(config)
+    df_raw = dl.load_data()
