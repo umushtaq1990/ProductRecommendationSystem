@@ -1,8 +1,9 @@
 title = "Recommendation Engine Default Configuration"
 # ==============================================================================
 [args]
-user_id = "id"
-rating_id = "rating"
+user_id = "userId"
+item_id = "movieId"
+data_folder = "data"
 
 [args.data_loader]
     movie_file = "movies.csv"

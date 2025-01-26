@@ -1,0 +1,10 @@
+movieId,title,genres
+1,A,Adventure|Animation|Children|Comedy|Fantasy
+2,B,Adventure|Children|Fantasy
+3,C,Comedy|Romance
+4,D,Comedy|Drama|Romance
+5,E,Comedy
+6,F,Action|Crime|Thriller
+7,G,Comedy|Romance
+8,H,Adventure|Children
+9,I,Action
