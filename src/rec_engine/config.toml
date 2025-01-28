@@ -6,6 +6,8 @@ item_id = "movieId"
 data_folder = "data"
 
 [args.data_loader]
+    azure_account_url = ""
+    azure_container_name = ""
     movie_file = "movies.csv"
     rating_file = "ratings.csv"
 

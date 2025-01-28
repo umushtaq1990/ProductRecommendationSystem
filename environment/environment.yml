@@ -5,6 +5,9 @@ channels:
 dependencies:
   - python=3.8
   - pandas=1.3.3
+  - azureml-core
+  - azure-identity
+  - azure-storage-blob
   - pip
   - pip:
       - multimethod==1.7
