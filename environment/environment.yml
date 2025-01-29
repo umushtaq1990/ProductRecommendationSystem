@@ -8,6 +8,7 @@ dependencies:
   - azureml-core=1.59.0
   - azure-identity=1.19.0
   - azure-storage-blob=12.24.1
+  - azureml-dataprep=5.3.2
   - mypy=1.14.1
   - pip
   - pip:
@@ -16,3 +17,4 @@ dependencies:
       - pytest==8.3.4
       - pre-commit==2.15.0
       - poetry==1.8.5
+      - pyarrow==17.0.0

@@ -69,6 +69,7 @@ class BaseNonFrozenConfig(ABC):
 class DataLoaderConfig(TypedDict, total=False):
     azure_account_url: str
     azure_container_name: str
+    az_ws_item_rating_data: str
     item_file: str
     rating_file: str
 

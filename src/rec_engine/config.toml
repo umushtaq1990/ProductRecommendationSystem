@@ -8,6 +8,7 @@ data_folder = "data"
 [args.data_loader]
     azure_account_url = ""
     azure_container_name = ""
+    az_ws_item_rating_data = "item_rating"
     item_file = "movies.csv"
     rating_file = "ratings.csv"
 
