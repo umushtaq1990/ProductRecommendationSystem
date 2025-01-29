@@ -92,6 +92,12 @@ Below is the directory structure for the recommender system project:
 ### Data
 Use this link to download movies.csv and ratings.csv files: https://www.kaggle.com/datasets/nicoletacilibiu/movies-and-ratings-for-recommendation-system?select=ratings.csv
 
+### Data Loader Workflow
+
+The following diagram represents the data loading workflow:
+
+![Workflow Diagram](documentation/data_loader_workflow.svg)
+
 
 ### Contributing
 If you have any suggestions or improvements for this project, feel free to fork the repository and submit a pull request.
