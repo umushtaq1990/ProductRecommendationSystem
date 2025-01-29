@@ -109,9 +109,6 @@ class DataLoader:
             logger.error(f"Failed to load data from Azure ML: {e}")
             item_file = getattr(self.args.data_loader, "item_file", "NA")
             rating_file = getattr(self.args.data_loader, "rating_file", "NA")
-            assert all(
-                isinstance(param, str) for param in [item_file, rating_file]
-            ), "item and rating file parameters are not provided"
             try:
                 # Try to load data from Azure Blob Storage
                 account_url = getattr(
@@ -120,11 +117,6 @@ class DataLoader:
                 container_name = getattr(
                     self.args.data_loader, "azure_container_name", "NA"
                 )
-                # Check if all required parameters are provided in string format
-                assert all(
-                    isinstance(param, str)
-                    for param in [account_url, container_name]
-                ), "Azure Blob Storage parameters are not provided"
 
                 df_items, df_ratings = self.load_data_from_blob(
                     account_url=account_url,
@@ -138,9 +130,6 @@ class DataLoader:
                 )
                 # Fallback to loading data from data folder
                 data_folder = getattr(self.args, "data_folder", "NA")
-                assert isinstance(
-                    data_folder, str
-                ), "data folder path is not provided"
                 df_items, df_ratings = self.load_data_from_local(
                     dir_path=data_folder,
                     rating_file=rating_file,
