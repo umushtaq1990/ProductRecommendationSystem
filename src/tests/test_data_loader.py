@@ -1,5 +1,5 @@
-
 from rec_engine.code.data_loader import DataLoader
+
 
 def test_preprocess_data(
     data_loader_module: DataLoader,

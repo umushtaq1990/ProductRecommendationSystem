@@ -1,27 +1,26 @@
-# DataLoader  module 
+# DataLoader  module
 # loads the data from desired directory or datastore component in azure data asset
 import logging
-from azureml.core import Workspace, Dataset
+from pathlib import Path
+from typing import Any, Dict, Union
+
+import pandas as pd
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
-import pandas as pd
-from typing import Any, Dict, Union
-from pathlib import Path
-from src.rec_engine.code.config import get_toml, ParametersConfig, SpecificParametersConfig
-from rec_engine.code.config import get_toml
+from azureml.core import Dataset, Workspace
+
+from rec_engine.code.config import ParametersConfig, get_toml
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class DataLoader:
-    def __init__(
-        self, config: Dict[str, Any]
-    ) -> None:
+    def __init__(self, config: Dict[str, Any]) -> None:
         self.config = config
         self.args = ParametersConfig.from_toml(path_or_dict=self.config)
-        self.data_loader_args = SpecificParametersConfig.from_toml(path_or_dict=self.config.get('args'), entry="data_loader")
-    
+
     @classmethod
     def from_toml(
         cls,
@@ -33,42 +32,64 @@ class DataLoader:
             config = get_toml()
         return cls(config=config)
 
-    def load_data_from_blob(self) -> pd.DataFrame:
+    @staticmethod
+    def load_data_from_blob(
+        account_url: str, container_name: str, item_file: str, rating_file: str
+    ) -> pd.DataFrame:
         """
         Load data from Azure Blob Storage
         """
         logger.info("Trying to load data from Azure Blob Storage")
+        # Initialize Azure Blob Service Client
         credential = DefaultAzureCredential()
-        blob_service_client = BlobServiceClient(account_url=self.data_loader_args.azure_account_url, credential=credential)
-        container_client = blob_service_client.get_container_client(self.data_loader_args.azure_container_name)
-        
-        blob_client_movies = container_client.get_blob_client("raw_movie_rating_data/movies.csv")
-        blob_client_ratings = container_client.get_blob_client("raw_movie_rating_data/ratings.csv")
-        
-        df_movies = pd.read_csv(blob_client_movies.download_blob().content_as_text())
-        df_ratings = pd.read_csv(blob_client_ratings.download_blob().content_as_text())
+        blob_service_client = BlobServiceClient(
+            account_url=account_url, credential=credential
+        )
+        container_client = blob_service_client.get_container_client(
+            container_name
+        )
+
+        # Download data files
+        movie_blob_client = container_client.get_blob_client(item_file)
+        movie_data = movie_blob_client.download_blob().readall()
+        df_items = pd.read_csv(pd.compat.StringIO(movie_data.decode("utf-8")))
+
+        rating_blob_client = container_client.get_blob_client(rating_file)
+        rating_data = rating_blob_client.download_blob().readall()
+        df_ratings = pd.read_csv(
+            pd.compat.StringIO(rating_data.decode("utf-8"))
+        )
         logger.info("Loaded data from Azure Blob Storage")
 
         # Check if item and rating files are not empty
-        assert not df_movies.empty, "Movie file is empty"
+        assert not df_items.empty, "Movie file is empty"
         assert not df_ratings.empty, "Rating file is empty"
 
-        return df_movies, df_ratings
+        return df_items, df_ratings
 
-    def load_data_from_local(self) -> pd.DataFrame:
+    @staticmethod
+    def load_data_from_csv(file_path: str) -> pd.DataFrame:
         """
-        Load data from local CSV files
+        Load data from CSV files
         """
-        logger.info("Trying to load data from local CSV files")
-        assert Path(self.args.data_folder).exists(), "Data folder does not exist"
-        assert Path(f"{self.args.data_folder}/{self.data_loader_args.movie_file}").exists(), "Movie file does not exist"
-        assert Path(f"{self.args.data_folder}/{self.data_loader_args.rating_file}").exists(), "Rating file does not exist"
-        df_movies = pd.read_csv(f"{self.args.data_folder}/{self.data_loader_args.movie_file}")
-        df_ratings = pd.read_csv(f"{self.args.data_folder}/{self.data_loader_args.rating_file}")
-        logger.info("Loaded data from local CSV files")
-        
-        return df_movies, df_ratings
-    
+        logger.info(f"trying to load data from local file {file_path}")
+        assert Path(file_path).exists(), "file does not exist"
+        df = pd.read_csv(file_path)
+        logger.info("data loaded successfully")
+        return df
+
+    def load_data_from_local(
+        self, dir_path: str, rating_file: str, item_file: str
+    ) -> pd.DataFrame:
+        """
+        Load data from local files
+        """
+        logger.info(f"Trying to load data from local directory {dir_path}")
+        assert Path(dir_path).exists(), "directory does not exist"
+        df_items = self.load_data_from_csv(f"{dir_path}/{item_file}")
+        df_ratings = pd.read_csv(f"{dir_path}/{rating_file}")
+        return df_items, df_ratings
+
     def load_data(
         self,
     ) -> pd.DataFrame:
@@ -77,26 +98,62 @@ class DataLoader:
         """
         try:
             # Try to load data from Azure ML registered data component
-            logger.info("Trying to load data from Azure ML registered data component")
+            logger.info(
+                "Trying to load data from Azure ML registered data component"
+            )
             ws = Workspace.from_config()
             dataset = Dataset.get_by_name(ws, name="raw_movie_rating_data")
             df = dataset.to_pandas_dataframe()
             logger.info("Loaded data from Azure ML registered data component")
         except Exception as e:
             logger.error(f"Failed to load data from Azure ML: {e}")
+            item_file = getattr(self.args.data_loader, "item_file", "NA")
+            rating_file = getattr(self.args.data_loader, "rating_file", "NA")
+            assert all(
+                isinstance(param, str) for param in [item_file, rating_file]
+            ), "item and rating file parameters are not provided"
             try:
                 # Try to load data from Azure Blob Storage
-                df_movies, df_ratings = self.load_data_from_blob()
+                account_url = getattr(
+                    self.args.data_loader, "azure_account_url", "NA"
+                )
+                container_name = getattr(
+                    self.args.data_loader, "azure_container_name", "NA"
+                )
+                # Check if all required parameters are provided in string format
+                assert all(
+                    isinstance(param, str)
+                    for param in [account_url, container_name]
+                ), "Azure Blob Storage parameters are not provided"
+
+                df_items, df_ratings = self.load_data_from_blob(
+                    account_url=account_url,
+                    container_name=container_name,
+                    item_file=item_file,
+                    rating_file=rating_file,
+                )
             except Exception as e:
-                logger.error(f"Failed to load data from Azure Blob Storage: {e}")
+                logger.error(
+                    f"Failed to load data from Azure Blob Storage: {e}"
+                )
                 # Fallback to loading data from data folder
-                df_movies, df_ratings = self.load_data_from_local()
+                data_folder = getattr(self.args, "data_folder", "NA")
+                assert isinstance(
+                    data_folder, str
+                ), "data folder path is not provided"
+                df_items, df_ratings = self.load_data_from_local(
+                    dir_path=data_folder,
+                    rating_file=rating_file,
+                    item_file=item_file,
+                )
 
             # Check if item and rating files are not empty
-            assert not df_movies.empty, "Movie file is empty"
+            assert not df_items.empty, "Item file is empty"
             assert not df_ratings.empty, "Rating file is empty"
             # Merge item and rating files
-            df = pd.merge(df_ratings, df_movies, on=self.args.item_id, how='left')
+            df = pd.merge(
+                df_ratings, df_items, on=self.args.item_id, how="left"
+            )
             logger.info("Merged movie and rating data")
 
         return df

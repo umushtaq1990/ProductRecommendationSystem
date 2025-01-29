@@ -1,5 +1,5 @@
 # Product Recommendation System
-This Python project is a powerful product-based recommendation engine designed to boost customer engagement and drive business growth. By analyzing user behavior, product features, and purchase history, it delivers personalized product suggestions. 
+This Python project is a powerful product-based recommendation engine designed to boost customer engagement and drive business growth. By analyzing user behavior, product features, and purchase history, it delivers personalized product suggestions.
 
 
 This repository contains a recommendation engine developed using two techniques:
@@ -51,47 +51,47 @@ Now, your environment is set up, activate the enviornment.
 
 Below is the directory structure for the recommender system project:
 
-📂 recommender-system  
+📂 recommender-system
 
-    │── 📄 README.md # Project documentation  
+    │── 📄 README.md # Project documentation
 
-    │── 📂 data # Dataset folder  
-        ├── 📄 interactions.csv # User interactions data  
-        ├── 📄 items.csv # Items metadata   
+    │── 📂 data # Dataset folder
+        ├── 📄 interactions.csv # User interactions data
+        ├── 📄 items.csv # Items metadata
 
-    │── 📂 environment # contain files to set enviornment  
-        ├── 📄 environment.yml # yaml file containing required packages   
+    │── 📂 environment # contain files to set enviornment
+        ├── 📄 environment.yml # yaml file containing required packages
 
-    │── 📂 src # Source code folder  
+    │── 📂 src # Source code folder
         ├── 📄 main.py # main script
-        │── 📂 rec_engine # Source code folder  
+        │── 📂 rec_engine # Source code folder
             ├── 📄 config.toml # configuration file
-            ├── 📄 version.py # contains package version 
-            │── 📂 code # Source code folder 
-                ├── 📄 data_loader.py # handles data loading/fetching  
+            ├── 📄 version.py # contains package version
+            │── 📂 code # Source code folder
+                ├── 📄 data_loader.py # handles data loading/fetching
                 ├── 📄 data_processor.py # used for data cleaning
-                ├── 📄 model.py # contain ml algorithims  
+                ├── 📄 model.py # contain ml algorithims
                 ├── 📄 evaluation.py # evaluate prediction results
-                ├── 📄 config.py # handles config file 
+                ├── 📄 config.py # handles config file
                 ├── 📄 pipeline.py # integrate modules
-        │── 📂 tests # Unit tests  
+        │── 📂 tests # Unit tests
             │── 📂 .test_data # folder containing sample test datsets
             ├── 📄 conftest.py # pytest configuration file
             ├── 📄 test_data_processor.py # contain unit tests for data processer module
             ├── 📄 test_modeling.py # contain unit tests for modling module
             ├── 📄 test_evaluator.py # contain unit tests for evaluation module
 
-    │── 📂  documentation # Diagrams and visualizations  
-        ├── 📄 workflow.svg # Workflow diagram  
+    │── 📂  documentation # Diagrams and visualizations
+        ├── 📄 workflow.svg # Workflow diagram
 
-    │── 📂 deployment # Deployment-related files  
-        ├── 📄 Dockerfile # Docker configuration  
-        ├── 📄 app.py # API endpoint  
-        ├── 📄 config.yaml # Configuration file  
+    │── 📂 deployment # Deployment-related files
+        ├── 📄 Dockerfile # Docker configuration
+        ├── 📄 app.py # API endpoint
+        ├── 📄 config.yaml # Configuration file
 
 ### Data
 Use this link to download movies.csv and ratings.csv files: https://www.kaggle.com/datasets/nicoletacilibiu/movies-and-ratings-for-recommendation-system?select=ratings.csv
- 
+
 
 ### Contributing
 If you have any suggestions or improvements for this project, feel free to fork the repository and submit a pull request.
@@ -110,21 +110,16 @@ those 100 users are
 checked for
 recommendations
 generated
-by different models 
+by different models
 by taking into account
 top n recommended
 results.If 70 users
 newly taken product matches with
 recommended results, recall
 score for that model
-will be 0.7 
+will be 0.7
 
 
-Author: Usman Mushtaq  
-Data Scientist / Data Engineer / Data Analyst  
+Author: Usman Mushtaq
+Data Scientist / Data Engineer / Data Analyst
 Email: usmanmushtaq1990@gmail.com
-
-
-
-
-

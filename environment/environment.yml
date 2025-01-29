@@ -5,12 +5,14 @@ channels:
 dependencies:
   - python=3.8
   - pandas=1.3.3
-  - azureml-core
-  - azure-identity
-  - azure-storage-blob
+  - azureml-core=1.59.0
+  - azure-identity=1.19.0
+  - azure-storage-blob=12.24.1
+  - mypy=1.14.1
   - pip
   - pip:
       - multimethod==1.7
       - toml==0.10.2
-      - pytest==6.2.5
+      - pytest==8.3.4
       - pre-commit==2.15.0
+      - poetry==1.8.5

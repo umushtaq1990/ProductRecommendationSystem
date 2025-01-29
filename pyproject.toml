@@ -2,7 +2,7 @@
 name = "product-recommendation-system"
 version = "0.1.0"
 description = "This tool generates recommendations using state of art AI algorithms"
-authors = [{ name = "Usman Mushtaq", email = "usmanmushtaq1990@gmail.com"}]
+authors = ["Usman Mushtaq <usmanmushtaq1990@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
