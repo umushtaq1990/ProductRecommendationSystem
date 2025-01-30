@@ -1,7 +1,6 @@
 # DataLoader  module
 # loads the data from desired directory or datastore component in azure data asset
 import io
-import logging
 from pathlib import Path
 from typing import Any, Dict, Union
 
@@ -11,10 +10,10 @@ from azure.storage.blob import BlobServiceClient
 from azureml.core import Dataset, Workspace
 
 from rec_engine.code.config import ParametersConfig, get_toml
+from rec_engine.code.logger import LoggerConfig
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = LoggerConfig.configure_logger("DataLoader")
 
 
 class DataLoader:
