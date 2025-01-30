@@ -94,9 +94,7 @@ Use this link to download movies.csv and ratings.csv files: https://www.kaggle.c
 
 ### Data Loader Workflow
 
-The following diagram represents the data loading workflow:
-
-![Workflow Diagram](documentation/data_loader_workflow.svg)
+The DataLoader module is designed to load data from various sources, including Azure ML registered data components, Azure Blob Storage, and local files. It ensures that data is efficiently loaded from the most appropriate source and made available for further processing and analysis. The module also includes functionality to upload data to Azure Blob Storage if it was initially loaded from a local directory. For more details check [`data_loader.md`](documentation/data_loader.md).
 
 
 ### Contributing
