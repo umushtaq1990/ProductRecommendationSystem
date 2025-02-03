@@ -67,15 +67,23 @@ class BaseNonFrozenConfig(ABC):
 
 
 class DataLoaderConfig(TypedDict, total=False):
-    azure_account_url: str
-    azure_container_name: str
     az_ws_item_rating_data: str
     item_file: str
     rating_file: str
+    output_file: str
+
+
+class BlobStorageConfig(TypedDict, total=False):
+    azure_account_url: str
+    azure_container_name: str
 
 
 class DataProcessorConfig(TypedDict, total=False):
     validation_data_duration: int
+    genres_drop_threshold: int
+    rating_year_col: str
+    duration_release_viewed_col: str
+    output_file: str
 
 
 @dataclass
@@ -103,7 +111,10 @@ class ParametersConfig(TOMLConfig, BaseNonFrozenConfig):
     Sets all parameters from args section of config.toml file.
 
     :param user_id: String containing user_id column name
-    :param rating_id: String containing rating_id column name
+    :param item_id: String containing item_id column name
+    :param title_id: String containing title_id column name
+    :param date_id: String containing date_id column name
+    :param genres_id: String containing genres_id column name
     :param data_folder: String containing data folder path
     :param data_loader: Dictionary containing data_loader specific parameters
     :param data_processor: Dictionary containing data_processor specific parameters
@@ -112,9 +123,13 @@ class ParametersConfig(TOMLConfig, BaseNonFrozenConfig):
 
     user_id: str
     item_id: str
+    title_id: str
+    date_id: str
+    genres_id: str
     data_folder: str
-    data_loader: GenericConfig
-    data_processor: GenericConfig
+    data_loader: DataLoaderConfig
+    data_processor: DataProcessorConfig
+    blob_params: BlobStorageConfig
 
     @classmethod
     def from_toml(
@@ -129,9 +144,11 @@ class ParametersConfig(TOMLConfig, BaseNonFrozenConfig):
         return cls(
             user_id=args.get("user_id"),
             item_id=args.get("item_id"),
+            title_id=args.get("title_id"),
+            date_id=args.get("date_id"),
+            genres_id=args.get("genres_id"),
             data_folder=args.get("data_folder"),
-            data_loader=GenericConfig.from_toml(args, entry="data_loader"),
-            data_processor=GenericConfig.from_toml(
-                args, entry="data_processor"
-            ),
+            data_loader=args.get("data_loader", {}),
+            data_processor=args.get("data_processor", {}),
+            blob_params=args.get("blob_params", {}),
         )

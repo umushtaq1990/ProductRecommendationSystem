@@ -3,14 +3,24 @@ title = "Recommendation Engine Default Configuration"
 [args]
 user_id = "userId"
 item_id = "movieId"
+title_id = "title"
+date_id = "timestamp"
+genres_id = "genres"
 data_folder = "data"
 
 [args.data_loader]
-    azure_account_url = ""
-    azure_container_name = ""
     az_ws_item_rating_data = "item_rating"
     item_file = "movies.csv"
     rating_file = "ratings.csv"
+    output_file = "raw_data.pkl"
 
 [args.data_processor]
     validation_data_duration = 3
+    genres_drop_threshold = 5
+    rating_year_col = "year_watched"
+    duration_release_viewed_col = "duration_release_viewed"
+    output_file = "processed_data.pkl"
+
+[args.blob_params]
+    azure_account_url = ""
+    azure_container_name = ""
