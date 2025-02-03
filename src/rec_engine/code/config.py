@@ -127,9 +127,9 @@ class ParametersConfig(TOMLConfig, BaseNonFrozenConfig):
     date_id: str
     genres_id: str
     data_folder: str
-    data_loader: DataLoaderConfig
-    data_processor: DataProcessorConfig
-    blob_params: BlobStorageConfig
+    data_loader: GenericConfig
+    data_processor: GenericConfig
+    blob_params: GenericConfig
 
     @classmethod
     def from_toml(
@@ -148,7 +148,9 @@ class ParametersConfig(TOMLConfig, BaseNonFrozenConfig):
             date_id=args.get("date_id"),
             genres_id=args.get("genres_id"),
             data_folder=args.get("data_folder"),
-            data_loader=args.get("data_loader", {}),
-            data_processor=args.get("data_processor", {}),
-            blob_params=args.get("blob_params", {}),
+            data_loader=GenericConfig.from_toml(args, entry="data_loader"),
+            data_processor=GenericConfig.from_toml(
+                args, entry="data_processor"
+            ),
+            blob_params=GenericConfig.from_toml(args, entry="blob_params"),
         )

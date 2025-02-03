@@ -14,6 +14,7 @@ sys.path.append(str(src_path))
 
 from rec_engine.code.azure_utils import (
     get_blob_container_client,
+    get_ws,
     upload_data_frame_to_blob,
 )
 from rec_engine.code.config import ParametersConfig, get_toml
@@ -89,7 +90,6 @@ class DataLoader:
         return df_items, df_ratings
 
     @staticmethod
-    @staticmethod
     def load_data_from_csv(file_path: str) -> pd.DataFrame:
         """
         Load data from CSV files
@@ -134,15 +134,7 @@ class DataLoader:
         logger.info("Loading data")
         data_available_in_ws = False
         run_context_available = False
-        try:
-            run = Run.get_context()
-            ws = run.experiment.workspace
-            logger.info(f"ws from run {ws}")
-            run_context_available = True
-        except Exception as e:
-            logger.error(f"Failed to get workspace from run: {e}")
-            ws = Workspace.from_config()
-            logger.info(f"ws from config {ws}")
+        ws = get_ws()
         try:
             # Try to load data from Azure ML registered data component
             df = self.load_data_from_azure_ml(
