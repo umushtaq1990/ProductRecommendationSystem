@@ -134,7 +134,7 @@ class DataLoader:
         logger.info("Loading data")
         data_available_in_ws = False
         run_context_available = False
-        ws = get_ws()
+        ws, run_context_available = get_ws()
         try:
             # Try to load data from Azure ML registered data component
             df = self.load_data_from_azure_ml(

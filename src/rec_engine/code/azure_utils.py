@@ -1,4 +1,4 @@
-import logging
+from typing import Tuple
 
 import pandas as pd
 from azure.identity import DefaultAzureCredential
@@ -11,16 +11,18 @@ from rec_engine.code.logger import LoggerConfig
 logger = LoggerConfig.configure_logger("AzureUtils")
 
 
-def get_ws() -> Workspace:
+def get_ws() -> Tuple[Workspace, bool]:
+    run_context_available = False
     try:
         run = Run.get_context()
         ws = run.experiment.workspace
         logger.info(f"ws from run {ws}")
+        run_context_available = True
     except Exception as e:
         logger.error(f"Failed to get workspace from run: {e}")
         ws = Workspace.from_config()
         logger.info(f"ws from config {ws}")
-    return ws
+    return ws, run_context_available
 
 
 def get_blob_container_client(
@@ -66,7 +68,7 @@ def register_or_update_dataset(df: pd.DataFrame, dataset_name: str) -> None:
     Register or update the dataset in Azure ML
     """
     try:
-        ws = get_ws()
+        ws, _ = get_ws()
         dataset = Dataset.get_by_name(ws, dataset_name)
         logger.info("Data already registered as a dataset in Azure ML")
         # check if datset profile is available, if not create one
@@ -88,7 +90,6 @@ def register_or_update_dataset(df: pd.DataFrame, dataset_name: str) -> None:
             logger.info("Data updated in Azure ML")
     except Exception as e:
         try:
-            ws = get_ws()
             dataset = Dataset.Tabular.register_pandas_dataframe(
                 df, ws.get_default_datastore(), dataset_name
             )
