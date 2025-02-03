@@ -57,7 +57,17 @@ def upload_data_frame_to_blob(
     # Initialize Azure Blob Service Client
     container_client = get_blob_container_client(account_url, container_name)
     item_blob_client = container_client.get_blob_client(file_name)
-    item_blob_client.upload_blob(df.to_csv(index=False), overwrite=True)
+    # if parquet file, use to_parquet method
+    if file_name.endswith(".parquet"):
+        item_blob_client.upload_blob(df.to_parquet(), overwrite=True)
+    elif file_name.endswith(".csv"):
+        item_blob_client.upload_blob(df.to_csv(index=False), overwrite=True)
+    elif file_name.endswith(".pkl"):
+        item_blob_client.upload_blob(df.to_pickle(), overwrite=True)
+    else:
+        raise ValueError(
+            f"Unsupported file format: {file_name}. Supported formats are .parquet and .csv"
+        )
     logger.info(
         f"{container_name}/{file_name} Uploaded data to Azure Blob Storage"
     )

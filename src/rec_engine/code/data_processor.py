@@ -214,10 +214,15 @@ class DataProcessor:
         )
         # Register or update the dataset in Azure ML
         try:
+            # log metrics
+            self.log_metrics(df)
+            # register or update the dataset in Azure ML
             register_or_update_dataset(df, "processed_item_ratings")
+            # save the processed data to the data folder
             output_path = os.path.join(input_dir, "processed_data.pkl")
             logger.info(f"Saving data at {output_path}")
             df.to_pickle(output_path)
+            # upload the processed data to Azure Blob Storage
             upload_data_frame_to_blob(
                 account_url=getattr(
                     self.args.blob_params, "azure_account_url", "NA"
@@ -230,8 +235,7 @@ class DataProcessor:
                 ),
                 df=df,
             )
-            # log metrics
-            self.log_metrics(df)
+
         except Exception as e:
             logger.error(
                 f"Failed to register or update the dataset in Azure ML: {e}"
