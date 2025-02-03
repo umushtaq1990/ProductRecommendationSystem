@@ -133,7 +133,6 @@ class DataLoader:
         """
         logger.info("Loading data")
         data_available_in_ws = False
-        run_context_available = False
         ws, run_context_available = get_ws()
         try:
             # Try to load data from Azure ML registered data component
@@ -228,13 +227,16 @@ class DataLoader:
             output_dir = os.path.join(
                 os.environ["AZUREML_DATAREFERENCE_outputs"]
             )
-            os.makedirs(output_dir, exist_ok=True)
-            # create file path
-            file_path = Path(
-                output_dir, getattr(self.args.data_loader, "output_file", "NA")
-            )
-            df.to_pickle(file_path)
-            logger.info(f"raw data saved to {file_path}")
+        else:
+            output_dir = self.args.data_folder
+
+        os.makedirs(output_dir, exist_ok=True)
+        # create file path
+        file_path = Path(
+            output_dir, getattr(self.args.data_loader, "output_file", "NA")
+        )
+        df.to_pickle(file_path)
+        logger.info(f"raw data saved to {file_path}")
         return df
 
 

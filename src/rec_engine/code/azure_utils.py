@@ -1,3 +1,4 @@
+import io
 from typing import Tuple
 
 import pandas as pd
@@ -55,21 +56,37 @@ def upload_data_frame_to_blob(
     logger.info("Uploading data to Azure Blob Storage")
 
     # Initialize Azure Blob Service Client
+    logger.info(f"path : {container_name}/{file_name}")
+    # make sure the container_name is not empty string
+    assert container_name, "Container name cannot be empty"
+    # make sure account_url is not empty string
+    assert account_url, "Account URL cannot be empty"
     container_client = get_blob_container_client(account_url, container_name)
     item_blob_client = container_client.get_blob_client(file_name)
-    # if parquet file, use to_parquet method
+
+    # Serialize the DataFrame based on the file extension
     if file_name.endswith(".parquet"):
-        item_blob_client.upload_blob(df.to_parquet(), overwrite=True)
+        buffer_b = io.BytesIO()
+        df.to_parquet(buffer_b, index=False)
+        buffer_b.seek(0)
+        item_blob_client.upload_blob(buffer_b, overwrite=True)
     elif file_name.endswith(".csv"):
-        item_blob_client.upload_blob(df.to_csv(index=False), overwrite=True)
+        buffer_s = io.StringIO()
+        df.to_csv(buffer_s, index=False)
+        buffer_s.seek(0)
+        item_blob_client.upload_blob(buffer_s.getvalue(), overwrite=True)
     elif file_name.endswith(".pkl"):
-        item_blob_client.upload_blob(df.to_pickle(), overwrite=True)
+        buffer_b = io.BytesIO()
+        df.to_pickle(buffer_b)
+        buffer_b.seek(0)
+        item_blob_client.upload_blob(buffer_b, overwrite=True)
     else:
         raise ValueError(
-            f"Unsupported file format: {file_name}. Supported formats are .parquet and .csv"
+            f"Unsupported file format: {file_name}. Supported formats are .parquet, .csv, and .pkl"
         )
+
     logger.info(
-        f"{container_name}/{file_name} Uploaded data to Azure Blob Storage"
+        f"Uploaded data to Azure Blob Storage: {container_name}/{file_name}"
     )
 
 

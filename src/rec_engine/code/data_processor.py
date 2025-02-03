@@ -1,11 +1,16 @@
 import os
+import sys
 from pathlib import Path
 from typing import Any, Dict, Union
 
 import pandas as pd
 from azureml.core import Run
 
+src_path = Path(__file__).resolve().parents[2]
+sys.path.append(str(src_path))
+
 from rec_engine.code.azure_utils import (
+    get_ws,
     register_or_update_dataset,
     upload_data_frame_to_blob,
 )
@@ -160,18 +165,28 @@ class DataProcessor:
         Process the data
         """
         logger.info("Processing data")
-        input_dir = os.environ["AZUREML_DATAREFERENCE_outputs"]
+        _, run_context_available = get_ws()
+        if run_context_available:
+            input_dir = os.environ["AZUREML_DATAREFERENCE_outputs"]
+            file_path = os.path.join(
+                input_dir, getattr(self.args.data_loader, "output_file", "NA")
+            )
+        else:
+            input_dir = self.args.data_folder
+            file_path = str(
+                Path(
+                    input_dir,
+                    getattr(self.args.data_loader, "output_file", "NA"),
+                )
+            )
         logger.info(f"Input directory: {input_dir}")
         # check if the dataframe is empty
         if df.empty:
             logger.error("Dataframe is empty")
             # try to load the data from the data folder
             try:
-                file_path = os.path.join(
-                    input_dir,
-                    getattr(self.args.data_loader, "output_file", "NA"),
-                )
-                logger.error(f"Trying to load the data from path: {file_path}")
+                logger.info(f"trying to load data from local file {file_path}")
+                assert Path(file_path).exists(), "file does not exist"
                 df = pd.read_pickle(file_path)
             except Exception as e:
                 logger.error(
