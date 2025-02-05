@@ -42,7 +42,7 @@ cd product-recommendation-engine
 Create a new Conda environment with the name specified in the .yml file.
 
 ```bash
-conda env create -f environment.yml
+conda env create -f environment/environment.yml
 ```
 Now, your environment is set up, activate the enviornment.
 
