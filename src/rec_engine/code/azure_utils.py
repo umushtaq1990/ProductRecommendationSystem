@@ -35,8 +35,31 @@ def get_blob_container_client(
     blob_service_client = BlobServiceClient(
         account_url=account_url, credential=credential
     )
+    container = blob_service_client.get_container_client(
+        container_name.split("/")[0]
+    )
+
+    # Create the container if it does not exist
+    create_container_if_not_exists(container)
+
     container_client = blob_service_client.get_container_client(container_name)
     return container_client
+
+
+def create_container_if_not_exists(container: ContainerClient) -> None:
+    """
+    Create the container if it does not exist.
+    """
+    try:
+        container.create_container()
+        logger.info(f"Container '{container.container_name}' created.")
+    except Exception as e:
+        if "ContainerAlreadyExists" in str(e):
+            logger.info(
+                f"Container '{container.container_name}' already exists."
+            )
+        else:
+            raise
 
 
 def upload_data_frame_to_blob(
@@ -57,8 +80,10 @@ def upload_data_frame_to_blob(
 
     # Initialize Azure Blob Service Client
     logger.info(f"path : {container_name}/{file_name}")
+
     # make sure the container_name is not empty string
     assert container_name, "Container name cannot be empty"
+
     # make sure account_url is not empty string
     assert account_url, "Account URL cannot be empty"
     container_client = get_blob_container_client(account_url, container_name)
