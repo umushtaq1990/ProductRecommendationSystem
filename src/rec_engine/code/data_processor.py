@@ -39,19 +39,19 @@ class DataProcessor:
 
     @staticmethod
     def process_genres(
-        df: pd.DataFrame, item_id: str, genres_col: str, threshold: int = 5
+        df: pd.DataFrame, item_id: str, genres_id: str, threshold: int = 5
     ) -> pd.DataFrame:
         """
         Process the genres column in the DataFrame
         """
         logger.info("Processing genres")
         # Get unique items and genres
-        df_items = df[[item_id, genres_col]].drop_duplicates()
+        df_items = df[[item_id, genres_id]].drop_duplicates()
         # Split genres into multiple columns, so that each genre has its own column
-        df_genres = df_items[genres_col].str.get_dummies()
+        df_genres = df_items[genres_id].str.get_dummies()
         # Rename (no genres listed) to "no_genres"
         df_genres = df_genres.rename(
-            columns={"(no genres listed)": f"no_{genres_col}"}
+            columns={"(no genres listed)": f"no_{genres_id}"}
         )
         # if genres columns contain less than 20 percent of records then drop the columns
         cols_to_drop = []
@@ -65,11 +65,11 @@ class DataProcessor:
         # log the columns dropped
         df_items = df_items.join(df_genres)
         # Drop the original genres column
-        df_items = df_items.drop(columns=[genres_col])
+        df_items = df_items.drop(columns=[genres_id])
         # merge the processed genres back to the original dataframe
         df = df.merge(df_items, on=item_id)
         # Drop the original genres column
-        df = df.drop(columns=[genres_col])
+        df = df.drop(columns=[genres_id])
         logger.info("Genres processed successfully")
         return df
 
@@ -198,7 +198,7 @@ class DataProcessor:
         df = self.process_genres(
             df=df.copy(),
             item_id=self.args.item_id,
-            genres_col=self.args.genres_id,
+            genres_id=self.args.genres_id,
             threshold=getattr(
                 self.args.data_processor, "genres_drop_threshold", 5
             ),

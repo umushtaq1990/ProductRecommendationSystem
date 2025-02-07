@@ -1,10 +1,12 @@
 from pathlib import Path
 from typing import Any, Dict
 
+import pandas as pd
 import pytest
 
 from rec_engine.code.config import get_toml
 from rec_engine.code.data_loader import DataLoader
+from rec_engine.code.data_processor import DataProcessor
 
 
 @pytest.fixture(autouse=True)
@@ -44,3 +46,20 @@ def config(config_path: Path, test_data_dir_path: Path) -> Dict[str, Any]:
 def data_loader_module(config: Dict[str, Any]) -> DataLoader:
     """get data loader class object"""
     return DataLoader.from_toml(path_or_dict=config)
+
+
+@pytest.fixture
+def data_processor_module(config: Dict[str, Any]) -> DataProcessor:
+    """get data loader class object"""
+    return DataProcessor.from_toml(path_or_dict=config)
+
+
+@pytest.fixture
+def raw_data(
+    data_loader_module: DataLoader,
+) -> pd.DataFrame:
+    """
+    test data loading
+    """
+    raw_data = data_loader_module.load_data()
+    return raw_data

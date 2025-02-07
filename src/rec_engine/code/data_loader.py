@@ -17,7 +17,7 @@ from rec_engine.code.azure_utils import (
     get_ws,
     upload_data_frame_to_blob,
 )
-from rec_engine.code.config import ParametersConfig, get_toml
+from rec_engine.code.config import DataLoaderConfig, ParametersConfig, get_toml
 from rec_engine.code.logger import LoggerConfig
 
 # Configure logging
@@ -132,70 +132,124 @@ class DataLoader:
         Load data from Azure ML registered data component, Azure Blob Storage, or data folder
         """
         logger.info("Loading data")
-        data_available_in_ws = False
-        ws, run_context_available = get_ws()
-        try:
-            # Try to load data from Azure ML registered data component
-            df = self.load_data_from_azure_ml(
-                ws=ws,
-                dataset_name=getattr(
-                    self.args.data_loader, "az_ws_item_rating_data", "NA"
-                ),
-            )
-            data_available_in_ws = True
-        except Exception as e:
-            logger.error(f"Failed to load data from Azure ML: {e}")
+
+        output_dir = self.args.data_folder
+
+        if not self.args.local_run:
+            logger.info("Running in Azure ML environment")
+            data_available_in_ws = False
+            ws, run_context_available = get_ws()
             try:
-                # Try to load data from Azure Blob Storage
-                df_items, df_ratings = self.load_data_from_blob(
-                    account_url=getattr(
-                        self.args.blob_params, "azure_account_url", "NA"
-                    ),
-                    container_name=getattr(
-                        self.args.blob_params, "azure_container_name", "NA"
-                    ),
-                    item_file=getattr(self.args.data_loader, "item_file", "NA"),
-                    rating_file=getattr(
-                        self.args.data_loader, "rating_file", "NA"
+                # Try to load data from Azure ML registered data component
+                df = self.load_data_from_azure_ml(
+                    ws=ws,
+                    dataset_name=getattr(
+                        self.args.data_loader, "az_ws_item_rating_data", "NA"
                     ),
                 )
+                data_available_in_ws = True
             except Exception as e:
-                logger.error(
-                    f"Failed to load data from Azure Blob Storage: {e}"
-                )
-                # Fallback to loading data from data folder
-                df_items, df_ratings = self.load_data_from_local(
-                    dir_path=self.args.data_folder,
-                    rating_file=getattr(
-                        self.args.data_loader, "rating_file", "NA"
-                    ),
-                    item_file=getattr(self.args.data_loader, "item_file", "NA"),
-                )
+                logger.error(f"Failed to load data from Azure ML: {e}")
+                try:
+                    # Try to load data from Azure Blob Storage
+                    df_items, df_ratings = self.load_data_from_blob(
+                        account_url=getattr(
+                            self.args.blob_params, "azure_account_url", "NA"
+                        ),
+                        container_name=getattr(
+                            self.args.blob_params, "azure_container_name", "NA"
+                        ),
+                        item_file=getattr(
+                            self.args.data_loader, "item_file", "NA"
+                        ),
+                        rating_file=getattr(
+                            self.args.data_loader, "rating_file", "NA"
+                        ),
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Failed to load data from Azure Blob Storage: {e}"
+                    )
+                    # Fallback to loading data from data folder
+                    df_items, df_ratings = self.load_data_from_local(
+                        dir_path=self.args.data_folder,
+                        rating_file=getattr(
+                            self.args.data_loader, "rating_file", "NA"
+                        ),
+                        item_file=getattr(
+                            self.args.data_loader, "item_file", "NA"
+                        ),
+                    )
 
-                # upload item, rating data to blob storage
-                upload_data_frame_to_blob(
-                    account_url=getattr(
-                        self.args.blob_params, "azure_account_url", "NA"
-                    ),
-                    container_name=getattr(
-                        self.args.blob_params, "azure_container_name", "NA"
-                    ),
-                    file_name=getattr(self.args.data_loader, "item_file", "NA"),
-                    df=df_items,
-                )
-                upload_data_frame_to_blob(
-                    account_url=getattr(
-                        self.args.blob_params, "azure_account_url", "NA"
-                    ),
-                    container_name=getattr(
-                        self.args.blob_params, "azure_container_name", "NA"
-                    ),
-                    file_name=getattr(
-                        self.args.data_loader, "rating_file", "NA"
-                    ),
-                    df=df_ratings,
-                )
+                    # upload item, rating data to blob storage
+                    upload_data_frame_to_blob(
+                        account_url=getattr(
+                            self.args.blob_params, "azure_account_url", "NA"
+                        ),
+                        container_name=getattr(
+                            self.args.blob_params, "azure_container_name", "NA"
+                        ),
+                        file_name=getattr(
+                            self.args.data_loader, "item_file", "NA"
+                        ),
+                        df=df_items,
+                    )
+                    upload_data_frame_to_blob(
+                        account_url=getattr(
+                            self.args.blob_params, "azure_account_url", "NA"
+                        ),
+                        container_name=getattr(
+                            self.args.blob_params, "azure_container_name", "NA"
+                        ),
+                        file_name=getattr(
+                            self.args.data_loader, "rating_file", "NA"
+                        ),
+                        df=df_ratings,
+                    )
 
+                # Check if item and rating files are not empty
+                assert not df_items.empty, "Item file is empty"
+                assert not df_ratings.empty, "Rating file is empty"
+                # Merge item and rating files
+                df = pd.merge(
+                    df_ratings, df_items, on=self.args.item_id, how="left"
+                )
+                logger.info("Merged item and rating data")
+
+                # Save data to Azure ML registered data component, if it is not already available
+                if not data_available_in_ws:
+                    logger.info(
+                        "Trying to save data to Azure ML registered data component"
+                    )
+                    dataset = Dataset.Tabular.register_pandas_dataframe(
+                        dataframe=df,
+                        target=ws.get_default_datastore(),
+                        name=getattr(
+                            self.args.blob_params,
+                            "az_ws_item_rating_data",
+                            "NA",
+                        ),
+                        description="Item and rating data",
+                        tags={"source": "Azure Blob Storage"},
+                    )
+                    logger.info(
+                        "Saved data to Azure ML registered data component"
+                    )
+
+            # Log metrics to Azure ML
+            if run_context_available:
+                self.log_metrics(df)
+                output_dir = os.path.join(
+                    os.environ["AZUREML_DATAREFERENCE_outputs"]
+                )
+        else:
+            logger.info("Running in local environment")
+            # Load data from local directory
+            df_items, df_ratings = self.load_data_from_local(
+                dir_path=self.args.data_folder,
+                rating_file=getattr(self.args.data_loader, "rating_file", "NA"),
+                item_file=getattr(self.args.data_loader, "item_file", "NA"),
+            )
             # Check if item and rating files are not empty
             assert not df_items.empty, "Item file is empty"
             assert not df_ratings.empty, "Rating file is empty"
@@ -204,31 +258,6 @@ class DataLoader:
                 df_ratings, df_items, on=self.args.item_id, how="left"
             )
             logger.info("Merged item and rating data")
-
-            # Save data to Azure ML registered data component, if it is not already available
-            if not data_available_in_ws:
-                logger.info(
-                    "Trying to save data to Azure ML registered data component"
-                )
-                dataset = Dataset.Tabular.register_pandas_dataframe(
-                    dataframe=df,
-                    target=ws.get_default_datastore(),
-                    name=getattr(
-                        self.args.blob_params, "az_ws_item_rating_data", "NA"
-                    ),
-                    description="Item and rating data",
-                    tags={"source": "Azure Blob Storage"},
-                )
-                logger.info("Saved data to Azure ML registered data component")
-
-        # Log metrics to Azure ML
-        if run_context_available:
-            self.log_metrics(df)
-            output_dir = os.path.join(
-                os.environ["AZUREML_DATAREFERENCE_outputs"]
-            )
-        else:
-            output_dir = self.args.data_folder
 
         os.makedirs(output_dir, exist_ok=True)
         # create file path

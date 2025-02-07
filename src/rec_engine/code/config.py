@@ -110,6 +110,7 @@ class ParametersConfig(TOMLConfig, BaseNonFrozenConfig):
     """
     Sets all parameters from args section of config.toml file.
 
+    :param local_run: Boolean indicating if the run is local or in azure environment
     :param user_id: String containing user_id column name
     :param item_id: String containing item_id column name
     :param title_id: String containing title_id column name
@@ -121,6 +122,7 @@ class ParametersConfig(TOMLConfig, BaseNonFrozenConfig):
 
     """
 
+    local_run: bool
     user_id: str
     item_id: str
     title_id: str
@@ -142,6 +144,7 @@ class ParametersConfig(TOMLConfig, BaseNonFrozenConfig):
         entry = entry or "args"  # Ensure entry is a string
         args = config.get(entry, {})
         return cls(
+            local_run=args.get("local_run"),
             user_id=args.get("user_id"),
             item_id=args.get("item_id"),
             title_id=args.get("title_id"),

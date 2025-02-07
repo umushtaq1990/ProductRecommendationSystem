@@ -1,6 +1,7 @@
 title = "Recommendation Engine Default Configuration"
 # ==============================================================================
 [args]
+local_run = true
 user_id = "userId"
 item_id = "movieId"
 title_id = "title"

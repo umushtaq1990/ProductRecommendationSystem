@@ -1,13 +1,13 @@
-from rec_engine.code.data_loader import DataLoader
+import pandas as pd
 
 
 def test_preprocess_data(
-    data_loader_module: DataLoader,
+    raw_data: pd.DataFrame,
 ) -> None:
     """
     test data loading
     """
-    df_res = data_loader_module.load_data()
+    df_res = raw_data.copy()
     # test if number of rows 14
     assert df_res.shape[0] == 14
     # test if number of columns 6
