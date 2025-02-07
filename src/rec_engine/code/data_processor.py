@@ -16,6 +16,7 @@ from rec_engine.code.azure_utils import (
 )
 from rec_engine.code.config import ParametersConfig, get_toml
 from rec_engine.code.logger import LoggerConfig
+from rec_engine.code.utils import remove_outliers_and_scale
 
 # Configure logging
 logger = LoggerConfig.configure_logger("DataProcessor")
@@ -74,58 +75,54 @@ class DataProcessor:
         return df
 
     @staticmethod
-    def remove_outliers_and_scale(df: pd.DataFrame, col: str) -> pd.DataFrame:
-        """
-        Remove outliers where col is greater than 3 standard deviations on the positive side
-        and scale the col column using min-max scaling
-        """
-        logger.info(f"Removing outliers and scaling {col}")
-        # Remove outliers where col is greater than 3 standard deviations on the positive side
-        # TODO adjust outlier removal logic and move to utils
-        # TODO adjust scaling logic and move to utis
-        df = df[df[col] <= df[col].mean() + 3 * df[col].std()]
-        # Log number of records where col is greater than 3 standard deviations on the positive side
-        logger.info(
-            f"Number of records where {col} is greater than 3 standard deviations on the positive side: {df[col].gt(df[col].mean() + 3 * df[col].std()).sum()}"
-        )
-        # Scale the col column using min-max scaling
-        df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min())
-        logger.info(f"Outliers removed and {col} scaled successfully")
-        return df
-
-    @staticmethod
     def get_years_since_release_viewed_feat(
         df: pd.DataFrame, title_col: str, timestamp_col: str, col_name: str
     ) -> pd.DataFrame:
         """
-        Process the title and timestamp columns to generate new columns related to the release year and the year watched
+        Process the title and timestamp columns to generate new columns related to the release year and the year watched.
         """
-        logger.info("Processing years")
-        # Generate a new column "year_released" from the title column
-        df["year_released"] = df[title_col].str.extract(r"\((\d{4})\)$")
-        df["year_released"] = pd.to_numeric(
-            df["year_released"], errors="coerce"
-        )
-        # Generate year column from timestamp
-        df["date_time"] = pd.to_datetime(df[timestamp_col], unit="s")
-        df["year_watched"] = df["date_time"].dt.year
-        # Get difference between year_released and year_watched
-        df[col_name] = df["year_watched"] - df["year_released"]
-        # log number of records where col is missing
-        logger.info(
-            f"Number of records where {col_name} is missing: {df[col_name].isnull().sum()}"
-        )
-        # Drop records where col is missing
-        df = df.dropna(subset=[col_name])
-        # remove records where col is negative
-        df = df[df[col_name] >= 0]
-        # log number of records where col is negative
-        logger.info(
-            f"Number of records where {col_name} is negative: {df[col_name].lt(0).sum()}"
-        )
-        # drop date_time column
-        df = df.drop(columns=["date_time"])
-        logger.info("Years processed successfully")
+        try:
+            logger.info("Processing years since release viewed feature")
+
+            # Extract the release year from the title column
+            df["year_released"] = df[title_col].str.extract(r"\((\d{4})\)$")
+            df["year_released"] = pd.to_numeric(
+                df["year_released"], errors="coerce"
+            )
+
+            # Convert timestamp to datetime and extract the year watched
+            df["date_time"] = pd.to_datetime(df[timestamp_col], unit="s")
+            df["year_watched"] = df["date_time"].dt.year
+
+            # Calculate the difference between year_released and year_watched
+            df[col_name] = df["year_watched"] - df["year_released"]
+
+            # Log the number of records where the calculated column is missing
+            missing_count = df[col_name].isnull().sum()
+            logger.info(
+                f"Number of records where {col_name} is missing: {missing_count}"
+            )
+
+            # Drop records where the calculated column is missing
+            df = df.dropna(subset=[col_name])
+
+            # Remove records where the calculated column is negative
+            negative_count = df[col_name].lt(0).sum()
+            logger.info(
+                f"Number of records where {col_name} is negative: {negative_count}"
+            )
+            df = df[df[col_name] >= 0]
+
+            # Drop the temporary date_time column
+            df = df.drop(columns=["date_time"])
+
+            logger.info("Years processed successfully")
+        except Exception as e:
+            logger.error(
+                f"Error processing years since release viewed feature: {e}"
+            )
+            raise
+
         return df
 
     @staticmethod
@@ -133,32 +130,64 @@ class DataProcessor:
         df: pd.DataFrame, last_n_years: int, year_col: str
     ) -> pd.DataFrame:
         """
-        Split the DataFrame into training and testing datasets based on the year_watched column
-        """
-        logger.info("Splitting data into train and test sets")
-        # Keep last n years data as test data
-        test_data = df[df[year_col] >= df[year_col].max() - last_n_years]
-        test_data["train"] = False
-        # Keep all data except last n years data as train data
-        train_data = df[df[year_col] < df[year_col].max() - last_n_years]
-        train_data["train"] = True
-        # Join train and test data
-        df = pd.concat([train_data, test_data])
-        logger.info("Data split into train and test sets successfully")
-        return df
+        Split the DataFrame into training and testing datasets based on the year_watched column.
 
-    def log_metrics(self, df: pd.DataFrame) -> None:
+        Parameters:
+        - df: pd.DataFrame - The input DataFrame.
+        - last_n_years: int - The number of recent years to include in the test set.
+        - year_col: str - The name of the column containing the year information.
+
+        Returns:
+        - pd.DataFrame - The DataFrame with an additional 'train' column indicating the split.
+        """
+        try:
+            logger.info("Splitting data into train and test sets")
+
+            # Determine the threshold year for splitting
+            threshold_year = df[year_col].max() - last_n_years
+
+            # Split the data into test and train sets
+            test_data = df[df[year_col] >= threshold_year].copy()
+            train_data = df[df[year_col] < threshold_year].copy()
+
+            # Add a 'train' column to indicate the split
+            test_data["train"] = False
+            train_data["train"] = True
+
+            # Concatenate the train and test data
+            df_split = pd.concat([train_data, test_data])
+
+            logger.info("Data split into train and test sets successfully")
+        except Exception as e:
+            logger.error(f"Error splitting data into train and test sets: {e}")
+            raise
+
+        return df_split
+
+    @staticmethod
+    def log_metrics(
+        df: pd.DataFrame, user_id_col: str, item_id_col: str
+    ) -> None:
         """
         Log metrics to Azure ML
+
+        Parameters:
+        - df: pd.DataFrame - The input DataFrame.
+        - user_id_col: str - The name of the column containing user IDs.
+        - item_id_col: str - The name of the column containing item IDs.
         """
-        run = Run.get_context()
-        run.log("rows", df.shape[0])
-        run.log("columns", df.shape[1])
-        run.log_list("columns_list", df.columns.tolist())
-        # log number of users and items
-        run.log("num_users", df[self.args.user_id].nunique())
-        run.log("num_items", df[self.args.item_id].nunique())
-        logger.info("Logged metrics")
+        try:
+            run = Run.get_context()
+            run.log("rows", df.shape[0])
+            run.log("columns", df.shape[1])
+            run.log_list("columns_list", df.columns.tolist())
+            # log number of users and items
+            run.log("num_users", df[user_id_col].nunique())
+            run.log("num_items", df[item_id_col].nunique())
+            logger.info("Logged metrics successfully")
+        except Exception as e:
+            logger.error(f"Error logging metrics: {e}")
+            raise
 
     def process_data(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -213,7 +242,7 @@ class DataProcessor:
             ),
         )
         # remove outliers and scale
-        df = self.remove_outliers_and_scale(
+        df = remove_outliers_and_scale(
             df,
             getattr(
                 self.args.data_processor, "duration_release_viewed_col", "NA"
@@ -230,7 +259,7 @@ class DataProcessor:
         # Register or update the dataset in Azure ML
         try:
             # log metrics
-            self.log_metrics(df)
+            self.log_metrics(df, self.args.user_id, self.args.item_id)
             # register or update the dataset in Azure ML
             register_or_update_dataset(df, "processed_item_ratings")
             # save the processed data to the data folder
