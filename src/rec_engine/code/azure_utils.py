@@ -1,5 +1,10 @@
 import io
-from typing import Tuple
+import sys
+from pathlib import Path
+from typing import List, Tuple
+
+src_path = Path(__file__).resolve().parents[2]
+sys.path.append(str(src_path))
 
 import pandas as pd
 from azure.identity import DefaultAzureCredential
@@ -105,14 +110,36 @@ def upload_data_frame_to_blob(
         df.to_pickle(buffer_b)
         buffer_b.seek(0)
         item_blob_client.upload_blob(buffer_b, overwrite=True)
+    elif file_name.endswith(".xlsx"):
+        buffer_b = io.BytesIO()
+        df.to_excel(buffer_b, index=False)
+        buffer_b.seek(0)
+        item_blob_client.upload_blob(buffer_b, overwrite=True)
     else:
         raise ValueError(
-            f"Unsupported file format: {file_name}. Supported formats are .parquet, .csv, and .pkl"
+            f"Unsupported file format: {file_name}. Supported formats are .parquet, .csv, .xlsx and .pkl"
         )
 
     logger.info(
         f"Uploaded data to Azure Blob Storage: {container_name}/{file_name}"
     )
+
+
+def list_files_in_container(
+    account_url: str, container_name: str, name_starts_with: str
+) -> List[str]:
+    """
+    List all files and folders in the given Azure Blob Storage container.
+
+    :param account_url: Azure Blob Storage account URL
+    :param container_name: Azure Blob Storage container name
+    :param name_starts_with: The prefix of the file or folder name
+
+    :return: List of file and folder names in the container
+    """
+    container_client = get_blob_container_client(account_url, container_name)
+    blob_list = container_client.list_blobs(name_starts_with=name_starts_with)
+    return [blob.name for blob in blob_list]
 
 
 def register_or_update_dataset(df: pd.DataFrame, dataset_name: str) -> None:
