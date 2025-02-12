@@ -1,15 +1,26 @@
 import logging
+import sys
 from datetime import datetime
-from typing import List, Optional, Tuple
+from pathlib import Path
+from typing import Optional
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from surprise import SVD, Dataset, Reader, Trainset, accuracy
 from surprise.model_selection import train_test_split
 
-logger = logging.getLogger("SVDModel")
+src_path = Path(__file__).resolve().parents[2]
+sys.path.append(str(src_path))
+
+from rec_engine.code.logger import LoggerConfig
+from rec_engine.code.model_utils import (
+    get_similar_users_cosine,
+    save_heatmap,
+    save_rmse_plot,
+)
+
+# Configure logging
+logger = LoggerConfig.configure_logger("SVDModel")
 
 
 class SVDModel:
@@ -193,38 +204,6 @@ class SVDModel:
             )
 
 
-def save_heatmap(pivot_table: pd.DataFrame, dir_path: str) -> None:
-    """
-    Save the heatmap of user similarities.
-
-    :param pivot_table: Pivot table containing user similarities
-    :param dir_path: Directory path to save the heatmap
-    """
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(pivot_table, annot=True, cmap="coolwarm", center=0)
-    plt.title("User Similarity Heatmap")
-    plt.savefig(f"{dir_path}/user_similarity_heatmap.png")
-    plt.show()
-
-
-def save_rmse_plot(rmse_values: List[Tuple[int, float]], dir_path: str) -> None:
-    """
-    Save the plot of RMSE vs. n_factors.
-
-    :param rmse_values: List of tuples containing n_factors and corresponding RMSE values
-    :param dir_path: Directory path to save the plot
-    """
-    n_factors_list, rmse_list = zip(*rmse_values)
-    plt.figure(figsize=(10, 6))
-    plt.plot(n_factors_list, rmse_list, marker="o")
-    plt.xlabel("Number of Latent Factors (n_factors)")
-    plt.ylabel("RMSE")
-    plt.title("RMSE vs. Number of Latent Factors")
-    plt.grid(True)
-    plt.savefig(f"{dir_path}/rmse_vs_n_factors.png")
-    plt.show()
-
-
 def find_optimal_n_factors(
     ratings_df: pd.DataFrame, test_size: float = 0.2, dir_path: str = "data"
 ) -> int:
@@ -242,9 +221,17 @@ def find_optimal_n_factors(
 
     # Generate a dynamic range of n_factors based on the number of users and items
     max_factors = min(num_users, num_items)
+    # make sure n_factor_list doenot contain 1
+
     n_factors_list = np.unique(
         np.logspace(0, np.log10(max_factors), num=10, dtype=int)
     )
+    n_factors_list = n_factors_list[n_factors_list != 1]
+    # if n_factors_list is empty through an error
+    if not len(n_factors_list):
+        raise ValueError(
+            "No suitable n_factors found. Please adjust the dataset size or the range of n_factors."
+        )
 
     best_n_factors = int(n_factors_list[0])
     best_rmse = float("inf")
@@ -337,6 +324,18 @@ if __name__ == "__main__":
 
     # Plot and save the heatmap
     save_heatmap(
-        pivot_table, dir_path="data"
+        pivot_table, dir_path="data", file_name="svd_users_similarity.png"
+    )  # Change this to your desired directory
+
+    print("Cosine Similarity on Raw Ratings:")
+    df_sim_cosine = get_similar_users_cosine(ratings_df)
+    pivot_table_cosine = df_sim_cosine.pivot(
+        index="user_id", columns="similar_user_id", values="similarity"
+    )
+    # Plot and save the heatmap
+    save_heatmap(
+        pivot_table_cosine,
+        dir_path="data",
+        file_name="cosine_user_similarity.png",
     )  # Change this to your desired directory
     print("Done")
